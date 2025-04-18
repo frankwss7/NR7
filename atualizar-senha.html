@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Atualizar Senha - NR7</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen px-4">
+  <div class="bg-white p-8 rounded shadow-md w-full max-w-sm">
+    <h1 class="text-2xl font-bold mb-6 text-blue-700 text-center">Atualizar Senha</h1>
+    <form id="form-redefinir" class="space-y-4">
+      <div>
+        <label for="novaSenha" class="block text-gray-700 font-medium">Nova senha</label>
+        <input type="password" id="novaSenha" required class="mt-1 w-full px-3 py-2 border border-gray-300 rounded"/>
+      </div>
+      <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition">Atualizar Senha</button>
+    </form>
+    <p id="mensagem" class="mt-4 text-sm text-green-600 hidden"></p>
+  </div>
+
+  <script>
+    const supabase = supabase.createClient(
+      "https://ludidaembqkovhccerqc.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx1ZGlkYWVtYnFrb3ZoY2NlcnFjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQ5NTQ4NTYsImV4cCI6MjA2MDUzMDg1Nn0.IuWoh-f_UmYD8Zu3JDeowIjVJHJTuur9Df3OVU0ZXb4"
+    );
+
+    const form = document.getElementById("form-redefinir");
+    const mensagem = document.getElementById("mensagem");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const novaSenha = document.getElementById("novaSenha").value;
+
+      const { data, error } = await supabase.auth.updateUser({ password: novaSenha });
+
+      if (error) {
+        alert("Erro: " + error.message);
+      } else {
+        mensagem.textContent = "✅ Senha atualizada com sucesso!";
+        mensagem.classList.remove("hidden");
+        setTimeout(() => window.location.href = "login.html", 3000);
+      }
+    });
+  </script>
+</body>
+</html>
