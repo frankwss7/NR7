@@ -1,0 +1,58 @@
+<!DOCTYPE html><html lang="pt-BR"><head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Avaliação Psicossocial</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+</head><body class="bg-gray-50 px-6 py-8">
+  <div class="max-w-2xl mx-auto">
+    <h1 class="text-2xl font-bold text-blue-700 mb-6">Avaliação Psicossocial - FRP-Br</h1>
+    <form id="form-avaliacao" class="space-y-6">
+      <div class="space-y-4" id="bloco-perguntas"></div>
+      <button type="submit" class="bg-blue-600 text-white py-2 px-6 rounded hover:bg-blue-700">Enviar</button>
+    </form>
+  </div>
+<script>
+  const supabase = supabase.createClient("https://ludidaembqkovhccerqc.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdX...");
+  const urlParams = new URLSearchParams(window.location.search);
+  const colaborador_id = urlParams.get("colaborador_id");
+  const ciclo = urlParams.get("ciclo") || "2025.1";
+
+  const perguntas = [
+    { id: 1, texto: "Você costuma trabalhar sob pressão por prazos?" },
+    { id: 2, texto: "Você sente que tem apoio da liderança?" },
+    { id: 3, texto: "Você tem autonomia para tomar decisões no trabalho?" }
+  ];
+
+  const bloco = document.getElementById("bloco-perguntas");
+  perguntas.forEach(p => {
+    const div = document.createElement("div");
+    div.innerHTML = `
+      <label class="block font-medium text-gray-700">${p.texto}</label>
+      <select name="pergunta_${p.id}" required class="w-full border px-3 py-2 rounded">
+        <option value="">Selecione...</option>
+        <option value="1">Nunca</option>
+        <option value="2">Raramente</option>
+        <option value="3">Às vezes</option>
+        <option value="4">Frequentemente</option>
+        <option value="5">Sempre</option>
+      </select>
+    `;
+    bloco.appendChild(div);
+  });
+
+  document.getElementById("form-avaliacao").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const respostas = [];
+    perguntas.forEach(p => {
+      const valor = parseInt(document.querySelector(`[name='pergunta_${p.id}']`).value);
+      respostas.push({ colaborador_id, pergunta_id: p.id, resposta: valor, ciclo });
+    });
+    const { error } = await supabase.from("respostas").insert(respostas);
+    if (!error) {
+      window.location.href = "obrigado.html";
+    } else {
+      alert("Erro ao salvar respostas.");
+    }
+  });
+</script></body></html>
