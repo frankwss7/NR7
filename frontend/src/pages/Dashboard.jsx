@@ -1,11 +1,11 @@
 import React from 'react'; 
 import { useAuth } from '../contexts/AuthContext'; 
  
-const Dashboard = () =
+const Dashboard = () => {
   const { user } = useAuth(); 
  
   return ( 
-      {/* Adicione mais conte£do do dashboard aqui */} 
+      {/* Adicione mais conteÂ£do do dashboard aqui */} 
   ); 
 }; 
  
