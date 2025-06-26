@@ -9,9 +9,6 @@ import './App.css';
  
 function App() { 
   return ( 
-            path="/dashboard" 
-            element={ 
-            } 
           {/* Adicione outras rotas protegidas aqui */} 
   ); 
 } 
