@@ -7,3 +7,5 @@ flask-mail
 python-dotenv 
 bcrypt 
 pandas 
+gunicorn 
+gunicorn 
