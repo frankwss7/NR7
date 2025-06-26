@@ -1,16 +1,29 @@
-import React from 'react'; 
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'; 
-import { AuthProvider } from './contexts/AuthContext'; 
-import ProtectedRoute from './components/ProtectedRoute'; 
-import Login from './pages/Login'; 
-import Dashboard from './pages/Dashboard'; 
-import Layout from './components/Layout'; 
-import './App.css'; 
- 
-function App() { 
-  return ( 
-          {/* Adicione outras rotas protegidas aqui */} 
-  ); 
-} 
- 
-export default App; 
+import React from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import Login from './pages/Login';
+import Dashboard from './pages/Dashboard';
+import ProtectedRoute from './components/ProtectedRoute';
+
+const App = () => {
+  return (
+    <Routes>
+      {/* Rota padrão - redireciona para login */}
+      <Route path="/" element={<Navigate to="/login" replace />} />
+      
+      <Route path="/login" element={<Login />} />
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <Dashboard />
+          </ProtectedRoute>
+        }
+      />
+      
+      {/* Rota para páginas não encontradas */}
+      <Route path="*" element={<Navigate to="/login" replace />} />
+    </Routes>
+  );
+};
+
+export default App;

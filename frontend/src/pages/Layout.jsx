@@ -1,21 +1,28 @@
-import React from 'react'; 
-import { useAuth } from '../contexts/AuthContext'; 
-import { Toaster } from 'react-hot-toast'; 
- 
-const Layout = ({ children }) =
-  const { logout } = useAuth(); 
- 
-  return ( 
-      {/* Sidebar */} 
-            {/* Adicione mais links de navegaá∆o aqui */} 
- 
-      {/* Main Content */} 
-        {/* Header */} 
-          {/* Adicione informaá‰es do usu†rio ou outras aá‰es aqui */} 
- 
-        {/* Page Content */} 
-          {children} 
-  ); 
-}; 
- 
-export default Layout; 
+import React from 'react';
+import { useAuth } from '../contexts/AuthContext';
+import { Toaster } from 'react-hot-toast';
+
+const Layout = ({ children }) => {
+  const { logout } = useAuth();
+
+  return (
+    <div className="layout">
+      {/* Sidebar */}
+      {/* Adicione mais links de navega√ß√£o aqui */}
+
+      {/* Main Content */}
+      <header>
+        {/* Adicione informa√ß√µes do usu√°rio ou outras a√ß√µes aqui */}
+      </header>
+
+      <main>
+        {children}
+      </main>
+
+      <Toaster />
+    </div>
+  );
+};
+
+export default Layout;
+

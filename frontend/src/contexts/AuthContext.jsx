@@ -1,49 +1,59 @@
-import React, { createContext, useState, useEffect, useContext } from 'react'; 
-import { useNavigate } from 'react-router-dom'; 
-import api from '../services/api'; 
- 
-const AuthContext = createContext(); 
- 
-export const AuthProvider = ({ children }) =
-  const [user, setUser] = useState(null); 
-  const [loading, setLoading] = useState(true); 
-  const navigate = useNavigate(); 
- 
-  useEffect(() =
-    const token = localStorage.getItem('token'); 
-    if (token) { 
-      api.defaults.headers.common['Authorization'] = `Bearer ${token}`; 
-      // Aqui vocˆ faria uma chamada para validar o token e buscar os dados do usu rio 
-      // Por simplicidade, vamos apenas definir um usu rio mock 
-      setUser({ email: 'user@example.com' }); 
-    } 
-    setLoading(false); 
-  }, []); 
- 
-  const login = async (email, password) =
-    try { 
-      const response = await api.post('/auth/login', { email, password }); 
-      const { access_token } = response.data; 
-      localStorage.setItem('token', access_token); 
-      api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`; 
-      setUser({ email }); // Definir usu rio ap¢s login bem-sucedido 
-      navigate('/dashboard'); 
-    } catch (error) { 
-      console.error('Login failed:', error); 
-      throw error; 
-    } 
-  }; 
- 
-  const logout = () =
-    localStorage.removeItem('token'); 
-    delete api.defaults.headers.common['Authorization']; 
-    setUser(null); 
-    navigate('/login'); 
-  }; 
- 
-  return ( 
-      {children} 
-  ); 
-}; 
- 
-export const useAuth = () =
+import React, { createContext, useState, useEffect, useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
+import api from '../services/api'; // Certifique-se de que o caminho estÃ¡ correto
+
+const AuthContext = createContext();
+
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const loadUser = async () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        try {
+          // Valida o token no backend
+          const response = await api.get('/auth/me', {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          setUser(response.data.user);
+        } catch (error) {
+          console.error('Token validation failed:', error);
+          localStorage.removeItem('token');
+          setUser(null);
+        }
+      }
+      setLoading(false);
+    };
+    loadUser();
+  }, []);
+
+  const login = async (email, password) => {
+    try {
+      const response = await api.post('/auth/login', { email, password });
+      localStorage.setItem('token', response.data.access_token);
+      setUser(response.data.user);
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Login failed:', error);
+      throw error; // Re-throw para que o componente de login possa lidar com o erro
+    }
+  };
+
+  const logout = () => {
+    localStorage.removeItem('token');
+    setUser(null);
+    navigate('/login');
+  };
+
+  return (
+    <AuthContext.Provider value={{ user, loading, login, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+export const useAuth = () => useContext(AuthContext);
+
