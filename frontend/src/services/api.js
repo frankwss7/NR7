@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://nr7-backend-production.up.railway.app', // substitua pela sua URL real
+  baseURL: baseURL: 'https://nr7-production.up.railway.app'
 });
 
 // Interceptor para incluir o token automaticamente em cada requisição
