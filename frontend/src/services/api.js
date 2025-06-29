@@ -1,16 +1,27 @@
 import axios from 'axios';
 
-const api = axios.create({
-  baseURL: baseURL: 'https://nr7-production.up.railway.app'
-});
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://nr7-production.up.railway.app';
 
-// Interceptor para incluir o token automaticamente em cada requisição
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  timeout: 10000,
+  headers: {
+    'Content-Type': 'application/json'
   }
-  return config;
-});
+} );
+
+// Interceptor para adicionar token
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 export default api;
