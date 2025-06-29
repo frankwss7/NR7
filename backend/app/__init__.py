@@ -18,7 +18,7 @@ def create_app():
     # Inicializar extensões
     db.init_app(app)
     jwt.init_app(app)
-    CORS(app)
+    CORS(app, resources={r"/auth/*": {"origins": "https://nr-7-theta.vercel.app"}})
     
     # Registrar blueprints
     from .auth import auth_bp
