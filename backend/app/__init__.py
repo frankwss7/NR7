@@ -1,26 +1,35 @@
+import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
-from config.config import Config
 
 db = SQLAlchemy()
 jwt = JWTManager()
 
 def create_app():
     app = Flask(__name__)
-    app.config.from_object(Config)
     
-    # Configurar JWT secret key se não estiver definida
-    if not app.config.get('JWT_SECRET_KEY'):
-        app.config['JWT_SECRET_KEY'] = 'nr7-secret-key-change-in-production'
+    # Configurações diretas
+    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'nr7-secret-key-change-in-production')
+    app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', 'nr7-jwt-secret-key-change-in-production')
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///nr7.db')
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     
     # Inicializar extensões
     db.init_app(app)
     jwt.init_app(app)
     
-    # Ativar CORS apenas para /auth vindos do Vercel
-    CORS(app, resources={r"/auth/*": {"origins": "https://nr-7-theta.vercel.app"}})
+    # CORS liberado para desenvolvimento e produção
+    CORS(app, resources={
+        r"/*": {
+            "origins": [
+                "https://nr-7-theta.vercel.app",
+                "http://localhost:3000",
+                "http://localhost:5173"
+            ]
+        }
+    })
     
     # Registrar blueprints
     from .auth import auth_bp
@@ -34,13 +43,14 @@ def create_app():
             'status': 'online',
             'version': '1.0.0',
             'endpoints': {
-                'auth': '/auth/login, /auth/me, /auth/test'
+                'auth': '/auth/login, /auth/me, /auth/test',
+                'health': '/health'
             }
         }
     
     # Rota de health check
     @app.route('/health')
     def health():
-        return {'status': 'healthy'}, 200
+        return {'status': 'healthy', 'service': 'nr7-backend'}, 200
     
     return app
