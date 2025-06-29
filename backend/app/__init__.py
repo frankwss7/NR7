@@ -10,9 +10,9 @@ jwt = JWTManager()
 def create_app():
     app = Flask(__name__)
     
-    # Configurações diretas
-    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'nr7-secret-key-change-in-production')
-    app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', 'nr7-jwt-secret-key-change-in-production')
+    # Configurações diretas (SEM config.py)
+    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'nr7-fallback-secret-key')
+    app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', 'nr7-fallback-jwt-key')
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///nr7.db')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     
@@ -20,7 +20,7 @@ def create_app():
     db.init_app(app)
     jwt.init_app(app)
     
-    # CORS liberado para desenvolvimento e produção
+    # CORS liberado
     CORS(app, resources={
         r"/*": {
             "origins": [
@@ -31,11 +31,15 @@ def create_app():
         }
     })
     
-    # Registrar blueprints
-    from .auth import auth_bp
-    app.register_blueprint(auth_bp)
+    # Registrar blueprints (com tratamento de erro)
+    try:
+        from .auth import auth_bp
+        app.register_blueprint(auth_bp)
+        print("✅ Auth blueprint registrado com sucesso!")
+    except Exception as e:
+        print(f"⚠️ Erro ao registrar auth blueprint: {e}")
     
-    # Rota de teste na raiz
+    # Rotas básicas
     @app.route('/')
     def index():
         return {
@@ -48,9 +52,9 @@ def create_app():
             }
         }
     
-    # Rota de health check
     @app.route('/health')
     def health():
         return {'status': 'healthy', 'service': 'nr7-backend'}, 200
     
+    print("✅ App NR7 criada com sucesso!")
     return app
