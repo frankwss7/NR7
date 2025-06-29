@@ -1,6 +1,7 @@
 from app import create_app
 
-app = create_app()  # isso precisa existir no nível global
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8080)
+try:
+    app = create_app()
+except Exception as e:
+    print(f"Erro ao criar app: {e}")
+    raise
