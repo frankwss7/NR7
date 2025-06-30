@@ -1,11 +1,11 @@
-from flask import Blueprint, request, jsonify 
+from flask import Blueprint, request, jsonify
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from werkzeug.security import check_password_hash
 import datetime
 
 auth_bp = Blueprint('auth', __name__, url_prefix='/auth')
 
-# Hashes gerados previamente com generate_password_hash
+# Simulação de usuários cadastrados (normalmente viria de um banco)
 USERS = {
     'admin@nr7.com': {
         'id': 1,
@@ -25,18 +25,18 @@ USERS = {
 def login():
     try:
         data = request.get_json()
-        if not data or not data.get('email') or not data.get('password'):
-            return jsonify({'error': 'Email e senha são obrigatórios'}), 400
-        
         email = data.get('email')
         password = data.get('password')
-        user = USERS.get(email)
 
+        if not email or not password:
+            return jsonify({'error': 'Email e senha são obrigatórios'}), 400
+
+        user = USERS.get(email)
         if not user or not check_password_hash(user['password'], password):
             return jsonify({'error': 'Credenciais inválidas'}), 401
 
-        expires = datetime.timedelta(hours=24)
-        access_token = create_access_token(identity=user['id'], expires_delta=expires)
+        token_expiration = datetime.timedelta(hours=24)
+        access_token = create_access_token(identity=user['id'], expires_delta=token_expiration)
 
         return jsonify({
             'access_token': access_token,
@@ -48,7 +48,9 @@ def login():
         }), 200
 
     except Exception as e:
+        print(f"[ERRO LOGIN] {e}")
         return jsonify({'error': 'Erro interno do servidor'}), 500
+
 
 @auth_bp.route('/me', methods=['GET'])
 @jwt_required()
@@ -69,12 +71,14 @@ def get_current_user():
         }), 200
 
     except Exception as e:
+        print(f"[ERRO ME] {e}")
         return jsonify({'error': 'Erro interno do servidor'}), 500
+
 
 @auth_bp.route('/test', methods=['GET'])
 def test():
     return jsonify({
-        'message': 'Backend NR7 funcionando!',
+        'message': '✅ Backend NR7 funcionando!',
         'endpoints': [
             'POST /auth/login - Fazer login',
             'GET /auth/me - Obter usuário atual (requer token)',
