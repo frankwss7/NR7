@@ -1,5 +1,5 @@
 import os
-from flask import Flask
+from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
@@ -11,18 +11,21 @@ jwt = JWTManager()
 def create_app():
     app = Flask(__name__)
 
-    # Configurações principais (fallbacks inclusos)
+    # Configurações principais (com fallback)
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'nr7-fallback-secret-key')
     app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', 'nr7-fallback-jwt-key')
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///nr7.db')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.config['SQLALCHEMY_ECHO'] = True
+    app.config['SQLALCHEMY_ECHO'] = True  # Mostra queries SQL no log
+
+    # Debug da string de conexão
+    print("🔎 DATABASE_URL detectado:", app.config['SQLALCHEMY_DATABASE_URI'])
 
     # Inicialização de extensões
     db.init_app(app)
     jwt.init_app(app)
 
-    # CORS liberado apenas para origens confiáveis
+    # CORS
     CORS(app, resources={
         r"/*": {
             "origins": [
@@ -33,7 +36,7 @@ def create_app():
         }
     })
 
-    # Registrar blueprints
+    # Blueprints
     try:
         from .auth import auth_bp
         app.register_blueprint(auth_bp)
@@ -41,7 +44,7 @@ def create_app():
     except Exception as e:
         print(f"❌ Erro ao registrar blueprint de autenticação: {e}")
 
-    # Rotas de verificação
+    # Rota raiz
     @app.route('/')
     def index():
         return {
@@ -52,9 +55,19 @@ def create_app():
                 '/auth/login',
                 '/auth/me',
                 '/auth/test',
+                '/auth/pingdb',
                 '/health'
             ]
         }
+
+    # Teste de conexão com banco
+    @app.route('/auth/pingdb')
+    def ping_db():
+        try:
+            db.session.execute('SELECT 1')
+            return jsonify({'db': 'ok'}), 200
+        except Exception as e:
+            return jsonify({'db': 'erro', 'detail': str(e)}), 500
 
     @app.route('/health')
     def health():
