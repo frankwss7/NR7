@@ -1,76 +1,59 @@
-import React, { useState } from 'react';
-import { useAuth } from '../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
-import { toast, Toaster } from 'react-hot-toast';
+import { useState } from 'react';
+import logo from './logo_app_psicossocial.png';
 
-const Login = () => {
+export default function LoginPage() {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const { login } = useAuth();
-  const navigate = useNavigate();
+  const [senha, setSenha] = useState('');
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    try {
-      await login(email, password);
-      toast.success('Login bem-sucedido!');
-      navigate('/dashboard');
-    } catch (error) {
-      toast.error('Credenciais inválidas ou erro no servidor.');
-      console.error('Login error:', error);
-    }
+    // aqui vai a lógica de autenticação
+    console.log('Login:', email, senha);
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-100 to-indigo-200 px-4">
-      <div className="w-full max-w-md bg-white p-8 rounded-2xl shadow-xl">
-        <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">
-          Acesse sua conta
-        </h2>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-100 to-blue-200 px-4">
+      <div className="bg-white shadow-xl rounded-2xl p-8 w-full max-w-md">
+        <div className="flex flex-col items-center mb-6">
+          <img src={logo} alt="Logo" className="w-24 h-24 mb-4 rounded-full shadow-md" />
+          <h1 className="text-2xl font-bold text-gray-800">Acesse sua conta</h1>
+        </div>
+
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-              E-mail
-            </label>
+            <label className="block text-sm font-medium text-gray-700">E-mail</label>
             <input
               type="email"
-              id="email"
-              className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md focus:ring focus:ring-indigo-300 focus:outline-none"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="seu@email.com"
               required
+              className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              placeholder="seu@email.com"
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-              Senha
-            </label>
+            <label className="block text-sm font-medium text-gray-700">Senha</label>
             <input
               type="password"
-              id="password"
-              className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md focus:ring focus:ring-indigo-300 focus:outline-none"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
+              value={senha}
+              onChange={(e) => setSenha(e.target.value)}
               required
+              className="w-full mt-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              placeholder="••••••••"
             />
           </div>
 
           <button
             type="submit"
-            className="w-full bg-indigo-600 text-white font-medium py-2 rounded-md hover:bg-indigo-700 transition duration-200"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-semibold shadow-sm transition"
           >
             Entrar
           </button>
         </form>
-        <Toaster position="top-center" />
       </div>
     </div>
   );
-};
-
-export default Login;
+}
 
 
