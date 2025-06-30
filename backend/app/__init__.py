@@ -32,7 +32,7 @@ def create_app():
         }
     })
 
-    # Importar e registrar blueprints
+    # Registrar blueprints
     try:
         from .auth import auth_bp
         app.register_blueprint(auth_bp)
@@ -40,7 +40,7 @@ def create_app():
     except Exception as e:
         print(f"❌ Erro ao registrar blueprint de autenticação: {e}")
 
-    # Rotas básicas
+    # Rotas de verificação
     @app.route('/')
     def index():
         return {
@@ -61,4 +61,5 @@ def create_app():
 
     print("✅ App NR7 criada com sucesso!")
     return app
+
 
