@@ -4,23 +4,24 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
 
+# Extensões globais
 db = SQLAlchemy()
 jwt = JWTManager()
 
 def create_app():
     app = Flask(__name__)
-    
-    # Configurações diretas (sem config.py externo)
+
+    # Configurações principais (fallbacks inclusos)
     app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'nr7-fallback-secret-key')
     app.config['JWT_SECRET_KEY'] = os.environ.get('JWT_SECRET_KEY', 'nr7-fallback-jwt-key')
     app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///nr7.db')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    
-    # Inicializar extensões
+
+    # Inicialização de extensões
     db.init_app(app)
     jwt.init_app(app)
-    
-    # CORS configurado para frontend em produção e local
+
+    # CORS liberado apenas para origens confiáveis
     CORS(app, resources={
         r"/*": {
             "origins": [
@@ -30,23 +31,34 @@ def create_app():
             ]
         }
     })
-    
-    # Importar e registrar blueprint de autenticação
+
+    # Importar e registrar blueprints
     try:
         from .auth import auth_bp
         app.register_blueprint(auth_bp)
-        print("✅ Auth blueprint registrada com sucesso!")
+        print("✅ Blueprint [auth_bp] registrada com sucesso!")
     except Exception as e:
-        print(f"⚠️ Erro ao registrar auth_bp: {e}")
-    
+        print(f"❌ Erro ao registrar blueprint de autenticação: {e}")
+
     # Rotas básicas
     @app.route('/')
     def index():
-        return {'message': 'NR7 API', 'status': 'online'}
-    
+        return {
+            'message': '🚀 NR7 Backend API online!',
+            'version': '1.0.0',
+            'status': 'ok',
+            'routes': [
+                '/auth/login',
+                '/auth/me',
+                '/auth/test',
+                '/health'
+            ]
+        }
+
     @app.route('/health')
     def health():
-        return {'status': 'healthy'}
-    
+        return {'status': 'healthy', 'service': 'nr7-backend'}, 200
+
     print("✅ App NR7 criada com sucesso!")
     return app
+
