@@ -19,7 +19,8 @@ def create_app():
     app.config['SQLALCHEMY_ECHO'] = True  # Mostra queries SQL no log
 
     # Debug da string de conexão
-    print("🔎 DATABASE_URL detectado:", app.config['SQLALCHEMY_DATABASE_URI'])
+    print("🔎 DATABASE_URL atual: ", app.config['SQLALCHEMY_DATABASE_URI'])
+
 
     # Inicialização de extensões
     db.init_app(app)
