@@ -1,7 +1,5 @@
-import React, { useState } from 'react';
-import { useAuth } from '../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
-import { toast, Toaster } from 'react-hot-toast';
+import { useState } from 'react';
+import logo from '../assets/logo_app_psicossocial.png';
 
 const Login = () => {
   const [email, setEmail] = useState('');
