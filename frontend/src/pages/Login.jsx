@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import logo from '../assets/logo_app_psicossocial.png';
 
+
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
